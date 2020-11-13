@@ -1,13 +1,28 @@
-function [R_HEEL_FOG , L_HEEL_FOG] = calculate_fog_BBY(trc_file , ifplot)
+% testing_code.m
 
-my_path = mfilename('fullpath');
-[filepath] = fileparts(my_path);
-cd(filepath)
+close all
+clear all
+clc
+% add the directory of helper functions to the path. note that addpath
+% checks for duplicates before appending, so this is only done once per
+% session.
+addpath trc-tools
+
+% add the directory of analysis methods to the path.
+addpath analysis-tools
+
+% make a change for plotting
+set(groot, 'DefaultTextInterpreter', 'none')
+set(groot, 'DefaultLegendInterpreter', 'none')
+set(groot, 'DefaultAxesTickLabelInterpreter', 'none')
+set(groot, 'DefaultFigureColor',[1 1 1])
+
+% load a sample trc file. don't forget the semicolon; it's a lot of data.
+% f = "study-data/trc-files/FOG-056/offmed-TUG-cognitive1-TP.trc";
 
 % set this flag to enable file i/o as binary .mat
 LEGACY = true;
 
-% read the data
 if ~LEGACY
     % load a sample trc file. don't forget the semicolon; it's a lot of data.
     f = 'offmed-TUG-standard1-TP.trc';
@@ -19,38 +34,35 @@ else
 end
 
 
+
 %% Part_2 Truncate 30 seconds of Data
+
 Data = table2array(d);
 k = Data(:,2);
 FindIndex=find(k==30);
 TruncatedData = Data(1: FindIndex, :);
 
-if ifplot == true
-    %% Part_3 Plot X-Coordinate of TOP HEAD
-    X_TopHead = TruncatedData(: , 3);
-    figure (1)
-    plot(X_TopHead,'LineWidth',2)
-    title('X-Coordinate of TOP HEAD');
-    
-    %% Part_4 Plot Z-Coordinates of TOP HEAD, ASIS and HEEL markers
-    ZTopHead = TruncatedData(: , 5);
-    Z_Asis   = TruncatedData(: , 125);
-    Z_LHeel  = TruncatedData(: , 149);
-    Z_RHeel  = TruncatedData(: , 176);
+%% Part_3 Plot X-Coordinate of TOP HEAD
+X_TopHead = TruncatedData(: , 3);
+figure (1)
+plot(X_TopHead,'LineWidth',2)
+title('X-Coordinate of TOP HEAD');
 
-    figure (2)
-    plot(ZTopHead,'LineWidth',2)
-    hold on
-    plot(Z_Asis,'LineWidth',2)
-    plot(Z_LHeel,'LineWidth',2)
-    plot(Z_RHeel,'LineWidth',2)
-    hold off
-    title('Z-Coordinates of various markers');
-    legend('Z-Coordinate of TOP-HEAD' , 'Z-Coordinate of ASIS' , 'Z-Coordinate of L-HEEL' , 'Z-Coordinate of R-HEEL');
+%% Part_4 Plot Z-Coordinates of TOP HEAD, ASIS and HEEL markers
+ZTopHead = TruncatedData(: , 5);
+Z_Asis    = TruncatedData(: , 125);
+Z_LHeel  = TruncatedData(: , 149);
+Z_RHeel  = TruncatedData(: , 176);
 
-end
-
-
+figure (2)
+plot(ZTopHead,'LineWidth',2)
+hold on
+plot(Z_Asis,'LineWidth',2)
+plot(Z_LHeel,'LineWidth',2)
+plot(Z_RHeel,'LineWidth',2)
+hold off
+title('Z-Coordinates of various markers');
+legend('Z-Coordinate of TOP-HEAD' , 'Z-Coordinate of ASIS' , 'Z-Coordinate of L-HEEL' , 'Z-Coordinate of R-HEEL');
 
 %% Part_5 Visualize spectrum of each of HEEL marker
 
@@ -86,44 +98,42 @@ pX_LHeel = abs(sX_LHeel).^2/n;
 pY_LHeel = abs(sY_LHeel).^2/n;
 pZ_LHeel = abs(sZ_LHeel).^2/n;
 
-if ifplot
-    figure (3)
-    subplot(2,3,1)
-    plot(f,pX_RHeel,'LineWidth',2)
-    title('X-Coordinate of R-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
+figure (3)
+subplot(2,3,1)
+plot(f,pX_RHeel,'LineWidth',2)
+title('X-Coordinate of R-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
-    subplot(2,3,2)
-    plot(f,pY_RHeel,'LineWidth',2)
-    title('Y-Coordinate of R-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
+subplot(2,3,2)
+plot(f,pY_RHeel,'LineWidth',2)
+title('Y-Coordinate of R-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
-    subplot(2,3,3)
-    plot(f,pZ_RHeel,'LineWidth',2)
-    title('Z-Coordinate of R-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
+subplot(2,3,3)
+plot(f,pZ_RHeel,'LineWidth',2)
+title('Z-Coordinate of R-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
-    subplot(2,3,4)
-    plot(f,pX_LHeel,'LineWidth',2)
-    title('X-Coordinate of L-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
+subplot(2,3,4)
+plot(f,pX_LHeel,'LineWidth',2)
+title('X-Coordinate of L-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
-    subplot(2,3,5)
-    plot(f,pY_LHeel,'LineWidth',2)
-    title('Y-Coordinate of L-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
+subplot(2,3,5)
+plot(f,pY_LHeel,'LineWidth',2)
+title('Y-Coordinate of L-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
-    subplot(2,3,6)
-    plot(f,pZ_LHeel,'LineWidth',2)
-    title('Z-Coordinate of L-HEEL');
-    xlabel('Frequency')
-    ylabel('Power')
-end
+subplot(2,3,6)
+plot(f,pZ_LHeel,'LineWidth',2)
+title('Z-Coordinate of L-HEEL');
+xlabel('Frequency')
+ylabel('Power')
 
 
 %% Part_6 Estimate Time varying power in 5-15 Hz window of each of HEEL marker
@@ -203,10 +213,78 @@ Clean_X_LHeel = sgolayfilt(X_LHeel,order,framelen);
 Clean_Y_LHeel = sgolayfilt(Y_LHeel,order,framelen);
 Clean_Z_LHeel = sgolayfilt(Z_LHeel,order,framelen);
 
+% It requires the current directory of "course-packet-main" folder
+% Auto setup the location
+my_path = mfilename('fullpath');
+[filepath, name, ext] = fileparts(my_path);
+slocation = filepath;
+% Change the location to run the code
+% slocation = 'C:\Users\bb\Documents\GitHub\course-packet-1';
+% Enter 0 or 1 for the plotting of a graph
+ifplot = 1;
+[R_HEEL_FOG , L_HEEL_FOG] = helper_1(slocation , ifplot);
+
+
+
+
+function percent_frozen = helper_2(zddot, ifplot)
+% function percent_frozen = apply_freeze_thresh(zddot)
+%
+% applies a median filter and a threshold operation to heel marker
+% acceleration magnitude. returns percent frozen.
+
+filter_order = 500;
+magnitude_thresh = 100;
+zddot_med = medfilt1(zddot,filter_order,[],1);
+
+frozen = all(zddot_med<magnitude_thresh,2);
+percent_frozen = round(100*sum(frozen)/length(frozen),1);
+
+if ifplot==1
+    close all
+    subplot(3,1,1)
+    plot(zddot)
+    subplot(3,1,2)
+    plot(zddot_med)
+    subplot(3,1,3)
+    plot(frozen)
+    ylim([-0.25 1.25])
+end
+
+end
+
+function [R_HEEL_FOG , L_HEEL_FOG] = helper_1(slocation , ifplot)
+
+% Input Arguments:
+%     slocation = Enter the current directory of "course-packet-main"
+%     ifplot    = Enter 0 or 1 for the plotting of a graph
+
+% Output Arguments:
+%     R_HEEL_FOG = A scalar number 
+%     L_HEEL_FOG = A scalar number 
+
+
+
+cd(slocation)
+LEGACY = true;
+
+if ~LEGACY
+    % load a sample trc file. don't forget the semicolon; it's a lot of data.
+    f = 'offmed-TUG-standard1-TP.trc';
+    d = read_trc(f);
+else
+    % load a pre-loaded .mat file containing the trc data.
+    f = 'offmed-TUG-standard1-TP.mat';
+    d = read_mat(f);
+end
+
+
 marker_names = names(d);
 markers = marker_names(contains(marker_names,["Heel"]));
 z = d{:,markers};
 t = d.Time;
+
+
 
 RHeel_zdot = sgolayderiv(z(:,1:3),t);
 LHeel_zdot = sgolayderiv(z(:,4:6),t);
@@ -216,6 +294,7 @@ RHeel_zddot = abs(sgolayderiv(RHeel_zdot,t));
 LHeel_zddot = abs(sgolayderiv(LHeel_zdot,t));
 
 
-R_HEEL_FOG = apply_freeze_thresh(RHeel_zddot);
-L_HEEL_FOG = apply_freeze_thresh(LHeel_zddot);
+R_HEEL_FOG = apply_freeze_thresh(RHeel_zddot, ifplot);
+L_HEEL_FOG = apply_freeze_thresh(LHeel_zddot, ifplot);
+
 end

@@ -39,8 +39,4 @@ peek(d)
 % if the LEGACY flag has been set, send the dataset to the calculate_fog_JLM method.
 % otherwise send the name of the .trc file.
 
-if ~LEGACY
-    [R_HEEL_FOG, L_HEEL_FOG] = calculate_fog_JLM(f,true);
-else
-    [R_HEEL_FOG, L_HEEL_FOG] = calculate_fog_JLM(d,true);
-end
+[R_HEEL_FOG, L_HEEL_FOG] = calculate_fog_BBY(f, true);
