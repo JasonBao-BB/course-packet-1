@@ -3,6 +3,7 @@
 
 ---
 ### solutions.m
+#### Change the slocation='xxx\GitHub\course-packet-1' in line 218 to your directory
 - This file is what I implemented all the details in satisfied the homework requirements
 - Load kinematic data
 - Truncate to first 30 seconds of file
